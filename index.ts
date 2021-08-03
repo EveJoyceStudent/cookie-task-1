@@ -1,12 +1,28 @@
 // Import stylesheets
 import './style.css';
 import { Cookie } from './models/Cookie';
+import { SprinkleCookie } from './models/SprinkleCookie';
+import { Colours } from './models/Colours.enum';
+
+const sprinkleSelector: HTMLSelectElement = <HTMLSelectElement>(
+  document.getElementById('sprinkleSelector')
+);
+const cookieName: HTMLInputElement = <HTMLInputElement>(
+  document.getElementById('cookieName-inp')
+);
+const addCookieButton: HTMLElement = document.getElementById('addCookie-btn');
+addCookieButton.addEventListener('click', event => {
+  addCookie();
+});
 
 const cookieSelector: HTMLSelectElement = <HTMLSelectElement>(
   document.getElementById('cookieSelector')
 );
+// const cookieColour: HTMLSelectElement = <HTMLSelectElement>(
+//   document.getElementById('cookieColour-inp')
+// );
 const cookieColour: HTMLSelectElement = <HTMLSelectElement>(
-  document.getElementById('cookieColour-inp')
+  document.getElementById('cookieColourSelector')
 );
 const cookiesDiv: HTMLElement = document.getElementById('cookiesDiv');
 
@@ -23,6 +39,17 @@ chipButton.addEventListener('click', event => {
 // Create a array/list of cookies named cookies
 const cookies: Cookie[] = [];
 
+function cookieNames(){
+  cookieSelector.innerHTML='';
+  for (let c in cookies) {
+    // console.log(cookies[c].name);
+    let newOption: HTMLOptionElement = document.createElement('option');
+    newOption.innerHTML = cookies[c].name;
+    newOption.value = String(cookies.indexOf(cookies[c]));
+    cookieSelector.add(newOption);
+  }
+}
+
 // create an init() function
 // init() will create two cookies called Cookie1 and Cookie2, and add them to the array of cookies
 function init() {
@@ -36,16 +63,21 @@ function init() {
   cookies.push(cookie2);
 
   // add them as options in the select/dropdown (cookieSelector) element
-  for (let c in cookies) {
-    // console.log(cookies[c].name);
-    let newOption: HTMLOptionElement = document.createElement('option');
-    newOption.innerHTML = cookies[c].name;
-    newOption.value = String(cookies.indexOf(cookies[c]));
-    cookieSelector.add(newOption);
+  cookieNames();
+
+  let count = 0;
+  for (let c in Colours) {
+    if (isNaN(Number(c))) {
+      let newOption: HTMLOptionElement = document.createElement('option');
+      newOption.innerHTML = c;
+      newOption.value = count.toString();
+      count++;
+      cookieColour.add(newOption);
+    }
   }
 
   // initialise the cookieColour-inp to the colour of the first cookie created
-  cookieColour.value = cookies[0].colour;
+  cookieColour.value = String(cookies[0].colour);
 
   updateDisplay();
 }
@@ -62,7 +94,10 @@ function drawCookies() {
     cookieDiv.innerHTML = String(cookies[c].chocolateChipNum);
     cookieDiv.classList.add('cookie');
     cookieDiv.id = cookies[c].name;
-    cookieDiv.setAttribute('style', `background-color: ${cookies[c].colour}`);
+    cookieDiv.setAttribute(
+      'style',
+      `background-color: ${Colours[cookies[c].colour]}`
+    );
     cookiesDiv.appendChild(cookieDiv);
   }
 }
@@ -78,6 +113,16 @@ function changeColour() {
 // upon pressing the button it should add a chocolate chip to cookies selected from the dropdown
 function addChocolateChip() {
   cookies[cookieSelector.value].chocolateChipNum++;
+  updateDisplay();
+}
+
+function addCookie() {
+  if ((sprinkleSelector.value == 'Cookie')) {
+    cookies.push(new Cookie(cookieName.value));
+  } else {
+    cookies.push(new SprinkleCookie(cookieName.value));
+  }
+  cookieNames();
   updateDisplay();
 }
 
