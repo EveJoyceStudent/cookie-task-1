@@ -1,0 +1,10 @@
+h1, h2 {
+  font-family: Lato;
+}
+
+.cookie {
+  width: 50px;
+  height: 50px;
+  margin: 2px;
+  color: white;
+}
